@@ -21,10 +21,21 @@
       text.axis-worktime {
         fill: #000;
       }
+
+      #title {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        text-align: center;
+      }
     </style>
     <script src="http://d3js.org/d3.v4.js"></script>
   </head>
   <body>
+    <div id="title">
+      <h1>Day / Hour Heatmap</h1>
+      <p>Example data shows concurrent user sessions over time, taken from a development environment.</p>
+      <p>Modified from: <a href="http://bl.ocks.org/ganezasan/dfe585847d65d0742ca7d0d1913d50e1">Source</a></p>
+      <hr>
+    </div>
     <div id="chart"></div>
     <div id="dataset-picker">
     </div>
