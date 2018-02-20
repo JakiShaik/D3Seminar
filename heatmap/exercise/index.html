@@ -1,0 +1,121 @@
+<!-- Modified from: http://bl.ocks.org/ganezasan/dfe585847d65d0742ca7d0d1913d50e1 -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      rect.bordered {
+        stroke: #E6E6E6;
+        stroke-width:2px;
+      }
+
+      text.mono {
+        font-size: 9pt;
+        font-family: Consolas, courier;
+        fill: #aaa;
+      }
+
+      text.axis-workweek {
+        fill: #000;
+      }
+
+      text.axis-worktime {
+        fill: #000;
+      }
+
+      #title {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        text-align: center;
+      }
+    </style>
+    <script src="http://d3js.org/d3.v4.js"></script>
+  </head>
+  <body>
+    <div id="title">
+      <h1>Day / Hour Heatmap</h1>
+      <p>Example data shows concurrent user sessions over time, taken from a development environment.</p>
+      <p>Modified from: <a href="http://bl.ocks.org/ganezasan/dfe585847d65d0742ca7d0d1913d50e1">Source</a></p>
+      <hr>
+    </div>
+    <div id="chart"></div>
+    <div id="dataset-picker">
+    </div>
+    <script type="text/javascript">
+      const margin = { top: 50, right: 0, bottom: 100, left: 30 },
+          width = 960 - margin.left - margin.right,
+          height = 430 - margin.top - margin.bottom,
+          gridSize = Math.floor(width / 24),
+          legendElementWidth = gridSize*2,
+          buckets = 9,
+          colors = ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#253494","#081d58"],
+          days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+          times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12a", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p", "12p"];
+          datasets = ["data.csv", "data2.csv"];
+
+      const svg = d3.select("#chart").append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      const dayLabels = svg.selectAll(".dayLabel")
+          .data(days)
+          .enter().append("text")
+            .text(function (d) { return d; })
+            .attr("x", 0)
+            .attr("y", (d, i) => i * gridSize)
+            .style("text-anchor", "end")
+            .attr("transform", "translate(-6," + gridSize / 1.5 + ")")
+            .attr("class", (d, i) => ((i >= 0 && i <= 4) ? "dayLabel mono axis axis-workweek" : "dayLabel mono axis"));
+
+      const timeLabels = svg.selectAll(".timeLabel")
+          .data(times)
+          .enter().append("text")
+            .text((d) => d)
+            .attr("x", (d, i) => i * gridSize)
+            .attr("y", 0)
+            .style("text-anchor", "middle")
+            .attr("transform", "translate(" + gridSize / 2 + ", -6)")
+            .attr("class", (d, i) => ((i >= 7 && i <= 16) ? "timeLabel mono axis axis-worktime" : "timeLabel mono axis"));
+
+      const type = (d) => {
+        return {
+          day: +d.day,
+          hour: +d.hour,
+          value: +d.value
+        };
+      };
+
+      const heatmapChart = function(csvFile) {
+        d3.csv(csvFile, type, (error, data) => {
+          
+          // Define color scale
+
+          // Define data for each card
+
+          // Add a title
+
+          // Define card size and transition functionality
+
+          // Get the title of the card
+
+          // Remove unneeded cards
+
+          // Define legend colors
+
+          // Give legend the legend class
+
+          // Define size of legend
+
+          // Add text to legend
+
+          // Remove unneeded elements from legend
+        });
+      };
+
+      // Set default dataset to the first one
+
+      // Data picker buttons
+      
+    </script>
+  </body>
+</html>
