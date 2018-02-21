@@ -1,55 +1,42 @@
 # Bar Chart
 
-## timeParse()
-Formats dates or times that you pass it.
+## scaleBand is for bar charts
+"When creating bar charts scaleBand helps to determine the geometry of the bars, taking into account padding between each bar. The domain is specified as an array of values (one value for each band) and the range as the minimum and maximum extents of the bands (e.g. the total width of the bar chart)." -- https://github.com/d3/d3-scale#time-scales
 ```js
-var parseTime = d3.timeParse("%B %d, %Y");
-parseTime("June 30, 2015"); // Tue Jun 30 2015 00:00:00 GMT-0700 (PDT)
+var bandScale = d3.scaleBand()
+    .domain(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
+    .range([0, 200]);
+
+bandScale('Mon'); // returns 0
+bandScale('Tue'); // returns 40
+bandScale('Fri'); // returns 160
 ```
 
-## scaleTime == scaleLinear -- kinda
-"Time scales are a variant of [linear scales](https://github.com/d3/d3-scale#linear-scales) that have a temporal domain: domain values are coerced to dates rather than numbers, and invert likewise returns a date. Time scales implement ticks based on calendar intervals, taking the pain out of generating axes for temporal domains." -- https://github.com/d3/d3-scale#time-scales
-```js
-var x = d3.scaleTime()
-    .domain([new Date(2000, 0, 1), new Date(2000, 0, 2)])
-    .range([0, 960]);
+### About the Enter set
+Scenario: "The number of DOM elements are less than the number of data points in the data set. This means that we need to add the missing elements to the DOM. These data points which don’t have a corresponding DOM element yet and are ready to enter the DOM in the form of DOM visual elements form the Enter set." -- http://rajapradhan.com/blogs/d3-js-v4-essentials/the-enter-update-exit-pattern/
 
-x(new Date(2000, 0, 1,  5)); // 200
-x(new Date(2000, 0, 1, 16)); // 640
-x.invert(200); // Sat Jan 01 2000 05:00:00 GMT-0800 (PST)
-x.invert(640); // Sat Jan 01 2000 16:00:00 GMT-0800 (PST)
-```
-
-### Set time parser and scale the axes
+### Set scale functions and ranges
 ```js
-var parseDate = d3.timeParse("%Y");
-var x = d3.scaleTime().rangeRound([0, width]);
+var x = d3.scaleBand().rangeRound([0, width]).padding(0.1);
 var y = d3.scaleLinear().rangeRound([height, 0]);
 ```
 
-## Define line
-```js
-var line = d3.line()
-    .x(function(d) { return x(d.year); })
-    .y(function(d) { return y(d.percent); });
-```
-
-## Format data
+## Format data row-by-row
 ```js
 function(d) {
-    d.year = parseDate(d.year);
-    d.percent = +d.percent;
+    d.population = +d.population;
     return d;
 }
 ```
 
-## Scale the data using extent()
+## Set domain for x and y
+The domain (input) for the x axis is the state abbreviations
 ```js
-x.domain(d3.extent(data, function(d) { return d.year; }));
-y.domain([0, d3.max(data, function(d) { return d.percent; })]);
+x.domain(data.map(function(d) { return d.state; }));
+y.domain([0, d3.max(data, function(d) { return d.population; })]);
 ```
 
-## Add x axis to graph
+## Add x axis to chart
 Move it from the top of the graph to the bottom where it belongs
 ```js
 g.append("g")
@@ -57,18 +44,24 @@ g.append("g")
     .call(d3.axisBottom(x));
 ```
 
-## Add y axis to graph
-Suggest that D3 use 10 ticks
-Put a percent sign after each tick label
+## Add y axis to chart
+Suggest that D3 use 15 ticks
 ```js
 g.append("g")
-    .call(d3.axisLeft(y).ticks(10, "%"));
+    .call(d3.axisLeft(y).ticks(15));
 ```
 
-## Add line to graph
+## Add bars to the chart
+The enter() set is all data that doesn't have an associated DOM element
+The bandwidth() function computes the width of a bar
+The height attribute is measured from the top of the y axis
 ```js
-g.append("path")
-    .datum(data)
-    .attr("id", "line")
-    .attr("d", line);
+g.selectAll(".bar")
+  .data(data) 
+  .enter().append("rect")
+    .attr("class", "bar")
+    .attr("x", function(d) { return x(d.state); })
+    .attr("y", function(d) { return y(d.population); })
+    .attr("width", x.bandwidth())
+    .attr("height", function(d) { return height - y(d.population); });
 ```

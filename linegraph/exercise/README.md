@@ -34,7 +34,7 @@ var line = d3.line()
     .y(function(d) { return y(d.percent); });
 ```
 
-## Format data
+## Format data row-by-row
 ```js
 function(d) {
     d.year = parseDate(d.year);
@@ -43,7 +43,7 @@ function(d) {
 }
 ```
 
-## Scale the data using extent()
+## Set domain using extent() and max()
 ```js
 x.domain(d3.extent(data, function(d) { return d.year; }));
 y.domain([0, d3.max(data, function(d) { return d.percent; })]);

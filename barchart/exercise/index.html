@@ -77,7 +77,7 @@
       }, function(error, data) {
         if (error) throw error;
 
-        // set span of values for each axis 
+        // set domain for each axis 
         x.domain(data.map(function(d) { return d.state; }));
         y.domain([0, d3.max(data, function(d) { return d.population; })]);
 
