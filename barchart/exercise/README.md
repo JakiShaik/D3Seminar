@@ -12,10 +12,10 @@ bandScale('Tue'); // returns 40
 bandScale('Fri'); // returns 160
 ```
 
-### About the Enter set
+## About the Enter set
 Scenario: "The number of DOM elements are less than the number of data points in the data set. This means that we need to add the missing elements to the DOM. These data points which don’t have a corresponding DOM element yet and are ready to enter the DOM in the form of DOM visual elements form the Enter set." -- http://rajapradhan.com/blogs/d3-js-v4-essentials/the-enter-update-exit-pattern/
 
-### Set scale functions and ranges
+## Set scale functions and ranges
 ```js
 var x = d3.scaleBand().rangeRound([0, width]).padding(0.1);
 var y = d3.scaleLinear().rangeRound([height, 0]);
