@@ -52,9 +52,9 @@ g.append("g")
 ```
 
 ## Add bars to the chart
-The enter() set is all data that doesn't have an associated DOM element
-The bandwidth() function computes the width of a bar
-The height attribute is measured from the top of the y axis
+The enter() set is all data that doesn't have an associated DOM element.
+The bandwidth() function computes the width of a bar.
+The height attribute is measured from the top of the y axis.
 ```js
 g.selectAll(".bar")
   .data(data) 

@@ -58,8 +58,8 @@ g.append("g")
 ```
 
 ## Add y axis to graph
-Suggest that D3 use 10 ticks
-Put a percent sign after each tick label
+Suggest that D3 use 10 ticks.
+Put a percent sign after each tick label.
 ```js
 g.append("g")
     .call(d3.axisLeft(y).ticks(10, "%"));
