@@ -1,0 +1,140 @@
+<html>
+
+</html>
+<style>
+  .node rect {
+  cursor: pointer;
+  fill: #fff;
+  fill-opacity: 0.5;
+  stroke: #3182bd;
+  stroke-width: 1.5px;
+  }
+  .node text {
+  font: 10px sans-serif;
+  pointer-events: none;
+  }
+  .link {
+  fill: none;
+  stroke: #9ecae1;
+  stroke-width: 1.5px;
+  }
+</style>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+  //set up the dimensions
+  var margin = {top: 30, right: 20, bottom: 30, left: 20},
+  width = 960,
+  barHeight = 20
+  barWidth = (width - margin.left - margin.right) * 0.8;
+  var i =0,
+      duration = 400,
+      root;
+
+    //creates a horizontal link between the nodes
+  var diagonal = d3.linkHorizontal()
+      .x(function(d){return d.y})
+      .y(function(d){return d.x});
+    
+    //creates an svg to hold the tree structure
+  var svg = d3.select("body").append("svg")
+          .attr("width", width) // + margin.left + margin.right)
+          .append("g")
+          .attr("transform","translate("+margin.left+","+margin.top+")");
+    
+    //loads JSON file 
+  d3.json("./tree.json",function(error,data){
+      if(error) {throw error}
+      
+      //d3.hierarchy will give us root node and array of its children in a JSON format
+      root = d3.hierarchy(data);
+      //starting positions of drawing rectangles
+      root.x0 = 0
+      root.y0 = 0
+      update(root);
+  });
+  function update(source) {
+      
+      //gives us flattened nodes list i;e all nodes in an array with properties data, parent, children
+      var nodes = root.descendants();
+      var height = Math.max(500, nodes.length * barHeight + margin.top + margin.bottom);
+      
+      d3.select("svg").transition()
+      .duration(duration)
+      .attr("height", height);
+      
+      //self.frameElement will return whether a object is embedded in other object or not
+      d3.select(self.frameElement).transition().duration(duration).style("height", height + "px");
+      var index = -1;
+      
+      //invokes all the elements in a pre order traversal (given node is only visited after previous noes), To set the height
+      root.eachBefore(function(n) {
+          n.x = ++index * barHeight;
+          n.y = n.depth * 20;
+      });
+      
+
+      var node = svg.selectAll(".node")
+      .data(nodes, function(d) { return d.id || (d.id = ++i); });
+      var nodeEnter = node.enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; }) //to set all of them initially to (0,0)
+      .style("opacity", 0);
+
+      //appending rectangular nodes at the previous positions
+      nodeEnter.append("rect")
+      .attr("y", -barHeight / 2)
+      .attr("height", barHeight)
+      .attr("width", barWidth)
+      .style("fill", color)
+      .on("click", click);
+      nodeEnter.append("text")
+      .attr("dy", 3.5)
+      .attr("dx", 5.5)
+      .text(function(d) { return d.data.name; });
+
+      //transition of nodes to their new positions
+      nodeEnter.transition()
+      .duration(duration)
+      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+      .style("opacity", 1);
+      node.transition().duration(duration).attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+      .style("opacity", 1).select("rect").style("fill", color);
+      //transition exiting the nodes to the new position. toggling back to the child nodes
+      node.exit().transition().duration(duration).attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+      .style("opacity", 0).remove();
+
+      //creating links
+      var link = svg.selectAll(".link").data(root.links(), function(d) { return d.target.id; });
+      link.enter().insert("path", "g").attr("class", "link").attr("d", function(d) {
+          var o = {x: source.x0, y: source.y0};
+          return diagonal({source: o, target: o});
+      })
+      .transition().duration(duration).attr("d",diagonal);
+      link.transition().duration(duration).attr("d", diagonal);
+      link.exit().transition().duration(duration).attr("d",function(d){
+          var o = {x: source.x, y: source.y};
+          return diagonal({source: o, target: o});
+      })
+      .remove();
+
+      //stashing old positions
+      root.each(function(d) {
+          d.x0 = d.x;
+          d.y0 = d.y;
+      });
+  }
+      function click(d) {
+          if (d.children) {
+              d._children = d.children;
+              d.children = null;
+          }
+          else {
+              d.children = d._children;
+              d._children = null;
+          }
+          update(d)
+      }
+      function color(d) {
+          return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
+      }
+</script>

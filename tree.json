@@ -1,0 +1,17 @@
+{
+    "name" : "MSSWI",
+    "children" : [
+        {
+            "name" : "BigData-Centric",
+            "children" : [{"name":"CS 534"},{"name":"CS 535"},{"name": "CS 540"},{"name":"CS 570"}]
+        },
+        {
+            "name" : "Human centric",
+            "children" : [{"name":"BA 518"},{"name":"CS 564"},{"name":"CS 565"},{"name":"CS 567"}]
+        },
+        {
+            "name": "System Centric",
+            "children" : [{"name":"CS 578"},{"name": "CS 544"}, {"name": "CS 540"},{"name":"CS 570"}]
+        }
+        ]
+}
