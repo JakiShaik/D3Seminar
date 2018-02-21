@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+  <title>D3 Bar Chart</title>
+  <style>
+    svg {
+      width: 960px;
+      height: 500px;
+    }
+    #title {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+    }    
+    .bar {
+      fill: orange;
+    }
+    .bar:hover {
+      fill: brown;
+    }
+  </style>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+</head>
+<body>
+
+  <div id="title">
+    <h1>Bar Chart</h1>
+    <p>Modified from:
+      <a href="https://bl.ocks.org/mbostock/3885304" target="_blank">Source</a>
+    </p>
+    <hr>
+  </div>
+
+  <h2>United States Population By State (2017)</h2>
+
+  <!-- this will be the bar chart -->
+  <svg></svg>  
+  
+  <script> 
+    var svg = d3.select("svg");
+
+    // get CSS property values
+    var cssWidth = parseInt(svg.style("width"));
+    var cssHeight = parseInt(svg.style("height"));
+
+    // without margins, part of the chart will be cut off
+    var margin = {top:20, right:20, bottom:30, left:80};
+    var width = cssWidth - margin.right - margin.left;
+    var height = cssHeight - margin.top - margin.bottom;
+
+    // scaleBand is a function for determining pixel values 
+    // associated with bar width and padding between bars
+    var x = d3.scaleBand().rangeRound([0, width]).padding(0.1);
+
+    // [height, 0] instead of [0, height] because SVG
+    // origin is at the upper left corner
+    var y = d3.scaleLinear().rangeRound([height, 0]);
+
+    // EXERCISE: create div for tooltip that shows population
+
+    // EXERCISE: declare function for putting commas in population number
+
+    // adjustment to fix chart clipping
+    // start a group at the upper left, inside the margins
+    var g = svg.append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    d3.csv(
+      // first parameter (required): input filename
+      "data.csv",
+      // second parameter (optional): change each row
+      function(d) {
+        // the + converts a number in a string to a number
+        d.population = +d.population;
+        return d;
+      // third parameter (optional): callback to be executed after data loaded 
+      }, function(error, data) {
+        if (error) throw error;
+
+        // set domain for each axis 
+        x.domain(data.map(function(d) { return d.state; }));
+        y.domain([0, d3.max(data, function(d) { return d.population; })]);
+
+        // add the x axis to the chart
+        g.append("g")
+          // the x axis initializes at the top of the chart so has to be moved
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x));
+
+        // EXERCISE: label the x axis
+
+        // add the y axis to the chart
+        g.append("g")
+          .call(d3.axisLeft(y).ticks(15));	
+
+        // EXERCISE: label the y axis
+
+        // add the data to the chart
+        g.selectAll(".bar")
+          .data(data)
+          // enter allows selecting all bars before they're created 
+          .enter().append("rect")
+            // svg can be styled using CSS
+            .attr("class", "bar")
+            // set x and y coordinates using values produced by scale functions
+            .attr("x", function(d) { return x(d.state); })
+            .attr("y", function(d) { return y(d.population); })
+            // bar width found using the band scale function
+            .attr("width", x.bandwidth())
+            // y(d.population) is y value starting from the top
+            // origin (0,0) is at upper-left corner
+            .attr("height", function(d) { return height - y(d.population); });
+
+          // EXERCISE: handle mouse moving over bar
+
+          // EXERCISE: handle mouse moving off of bar
+          
+      });
+
+  </script>
+  <p><em>Source: U.S. Census Bureau, Vintage 2017 Population Estimates</em></p>
+
+</body>
+
+<!--
+LICENSE
+Released under the GNU General Public License, version 3.
+https://opensource.org/licenses/GPL-3.0
+-->
