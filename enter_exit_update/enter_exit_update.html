@@ -23,7 +23,7 @@
             .data(data)
             .enter()
             .append("li")
-            .text(function(d) { return d + " "; });
+            .text(function(d) { return d; });
 
         // remove extra data
         data = [9, 4];
@@ -37,7 +37,7 @@
         d3.select("#data")
             .selectAll("li")
             .data(data)
-            .text(function(d) { return d + " "; });
+            .text(function(d) { return d; });
     </script>
 </body>
 </html>
