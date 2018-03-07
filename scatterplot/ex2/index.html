@@ -4,12 +4,6 @@
 
 <head>
     <style>
-        .line {
-            fill: none;
-            stroke: orange;
-            stroke-width: 2px;
-        }
-
         #title {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
@@ -45,15 +39,6 @@
         var x = d3.scaleTime().range([0, width]);
         var y = d3.scaleLinear().range([height, 0]);
 
-        // define the line
-        var valueline = d3.line()
-            .x(function (d) {
-                return x(d.date);
-            })
-            .y(function (d) {
-                return y(d.close);
-            });
-
         // append the svg obgect to the body of the page
         // appends a 'group' element to 'svg'
         // moves the 'group' element to the top left margin
@@ -64,41 +49,44 @@
             .attr("transform",
                 "translate(" + margin.left + "," + margin.top + ")");
 
-        // Get the data
-        d3.csv("data.csv", function (error, data) {
+
+        // load data
+        d3.queue()
+            .defer(d3.csv, "data.csv")
+            .defer(d3.csv, "data2.csv")
+            .awaitAll(loadData);
+
+        function loadData(error, datum) {
             if (error) throw error;
 
-            // format the data
-            data.forEach(function (d) {
-                d.date = parseTime(d.date);
-                d.close = +d.close;
-            });
-
-            // Scale the range of the data
-            x.domain(d3.extent(data, function (d) {
-                return d.date;
-            }));
-            y.domain([0, d3.max(data, function (d) {
-                return d.close;
-            })]);
-
-            // Add the valueline path.
-            svg.append("path")
-                .data([data])
-                .attr("class", "line")
-                .attr("d", valueline);
-
-            // Add the scatterplot
-            svg.selectAll("dot")
-                .data(data)
-                .enter().append("circle")
-                .attr("r", 5)
-                .attr("cx", function (d) {
-                    return x(d.date);
-                })
-                .attr("cy", function (d) {
-                    return y(d.close);
+            datum.forEach(function(data) {
+                
+                // format the data
+                data.forEach(function (d) {
+                    d.date = parseTime(d.date);
+                    d.close = +d.close;
                 });
+
+                // Scale the range of the data
+                x.domain(d3.extent(data, function (d) {
+                    return d.date;
+                }));
+                y.domain([0, d3.max(data, function (d) {
+                    return d.close;
+                })]);
+
+                // Add the scatterplot
+                svg.selectAll("dot")
+                    .data(data)
+                    .enter().append("circle")
+                    .attr("r", 5)
+                    .attr("cx", function (d) {
+                        return x(d.date);
+                    })
+                    .attr("cy", function (d) {
+                        return y(d.close);
+                    });
+            });
 
             // Add the X Axis
             svg.append("g")
@@ -108,8 +96,7 @@
             // Add the Y Axis
             svg.append("g")
                 .call(d3.axisLeft(y));
-
-        });
+        }
     </script>
 </body>
 
