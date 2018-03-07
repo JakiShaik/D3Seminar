@@ -1,0 +1,16 @@
+.line2 {
+            fill: none;
+            stroke:greenyellow;
+            stroke-width: 2px;
+        }
+
+var valueline2 = d3.line()
+            .x(function(d) { return x(d.date); })
+            .y(function(d) { return y(d.open); });
+
+            d.open = +d.open; //Data formatting
+svg.append("path")
+                .data([data])
+                .attr("class","line2")
+                .attr("d",valueline2)
+            
