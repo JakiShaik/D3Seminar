@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Hello D3</title>
+</head>
+<body>
+    <ul id="data"></ul>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script>
+        // initial data
+        var data = [1, 2, 3];
+        d3.select("#data")
+            .selectAll("li")
+            .data(data)
+            .enter()
+            .append("li")
+            .text(function(d) { return d; });
+
+        data = [12, 4, 9, 10, 3];
+        // add new data
+        d3.select("#data")
+            .selectAll("li")
+            .data(data)
+            .enter()
+            .append("li")
+            .text(function(d) { return d; });
+
+        // remove extra data
+        data = [9, 4];
+        d3.select("#data")
+            .selectAll("li")
+            .data(data)
+            .exit()
+            .remove();
+
+        // update selection
+        d3.select("#data")
+            .selectAll("li")
+            .data(data)
+            .text(function(d) { return d; });
+    </script>
+</body>
+</html>
