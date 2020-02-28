@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body>
+    <style> /* set the CSS */
+        .line1 {
+            fill: none;
+            stroke: orangered;
+            stroke-width: 2px;
+        }
+        
+    </style>
+    <!-- include the D3 library -->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script>
+        //Set the margin object, clockwise from top
+        //width and height as inner dimensions(area where you plot graph) of the chart  
+        //Margin convention: https://bl.ocks.org/mbostock/3019563
+        var margin = {top: 20, right: 20, bottom: 30, left: 50},
+            width = 960 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+        
+        // create the axes and give them ranges
+        // .range([closer_to_the_origin, further_from_the_origin])
+        // The graph that svg assumes is kind of reverse and that's why we have to shift the values for y axis
+        // x and y are functions
+        var x = d3.scaleTime().range([0, width]);
+        var y = d3.scaleLinear().range([height, 0]);
+        //Appending a svg to the DOM with specified width and height
+        //appends a group element to the svg and move it to top left. 
+        //This is achieved through applying transformation to g element
+        var svg = d3.select("body").append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform",
+                            "translate(" + margin.left + "," + margin.top + ")");
+        //svg is a array of group elements. In this case array of one g element 
+        //console.log(svg)
+
+        //To parse the date. There are different ways we can parse a date in D3. There are different ways 
+        //we can parse the date
+        //https://github.com/d3/d3-time-format/blob/master/README.md#locale_format
+        //parseTime is a function
+        var parseTime = d3.timeParse("%d-%b-%y");
+
+        //This part will take the raw data that we have received from d3.csv() and converts it into equivalent co-ordinates
+        // valueline is a function. Each time this line function is called on, 
+        //it will go through the data and will assign coordinates to ‘date’ and ‘close’ pairs 
+        //using the ‘x’ and ‘y’ functions that we set up earlier (which are responsible for scaling and 
+        //setting the correct range / domain)
+        var valueline = d3.line()
+            .x(function(d) { return x(d.date); })
+            .y(function(d) { return y(d.close); });
+        
+        d3.csv("data2.csv", function(error, data) {
+            //console.log(error)
+            //throws error if there is no such file. Error is an object
+            if (error) throw error;
+            //console.log(data)
+            //d3.csv will return an array with all the fields(each field as an JSON object with first line of file as the keys)
+            //modify the data. close variable here should be a numerical value to plot. The second line will make sure
+            //that it is a numeric value if it is not already so.
+            //D3 will automatically stretches the graph for different timelines. So use parseTime
+            data.forEach(function(d) {
+                d.date = parseTime(d.date);
+                d.close = +d.close;
+            });
+            
+            //While we create x and Y, we have told D3 where the datagrams should lie on the graph
+            // These two lines will tell what should be the scope of data
+            // extent will return maximum and minimum dates and for Y axis the reason why we say (0, max) is we want
+            // fields on y axis to start from 0 or else we can still say extent
+            x.domain(d3.extent(data, function(d) { return d.date; }));
+            y.domain([0, d3.max(data, function(d) { return Math.max(d.close,d.open); })]);
+
+            //adds a new path element(a path element is something that we can use to draw shapes according to co-ordinates)
+            // we get each data element and we are giving line as class name to apply styles
+            //Here for each data element we call valueline function and attr d is a mini language specific to D3 which 
+            //will move do M-moveto, Z-closepath, L-lineto, C-curveto
+            // This is the key part which draws the line
+            svg.append("path")
+                .data([data])
+                .attr("class", "line1")
+                .attr("d", valueline);
+            // Add the X Axis
+            // axisBottom will create ticks on bottom side of the x axis and transform will move the x axis from top to bottom
+            svg.append("g")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x));
+            //Y axis can start from wherever it is and axisLeft will draw ticks on the left side
+            // Add the Y Axis
+            svg.append("g")
+                .call(d3.axisLeft(y));
+            });
+    </script>
